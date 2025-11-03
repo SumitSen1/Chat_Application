@@ -6,14 +6,14 @@ dotenv.config({
     path: "./.env"
 });
 connectDB()
-.then(()=>{
-    server.on("Error",(error)=>{
-        console.log("Error",error);
-    })
-    app.listen(process.env.PORT || 8000, ()=>{
-        console.log(`Server is running at the PORT ${process.env.PORT}`);
-        
-    })
+.then(() => {
+    const server = app.listen(process.env.PORT || 8000, () => {
+        console.log(`Server is running at PORT ${process.env.PORT || 8000}`);
+    });
+
+    server.on("error", (error) => {
+        console.log("Server Error:", error);
+    });
 })
 .catch((error)=>{
     console.log("Mongoo connection DB is Failed !!", error);

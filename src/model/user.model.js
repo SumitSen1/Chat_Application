@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken"
 
 const userSchema = new mongoose.Schema(
     {
-        fullname: {
+        fullName: {
             type: String,
             required: true,
             unique: true,
@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save",async function (next){
     if(!this.isModified("password")) return next();
-    this.password = await bcrypt.hash(this.password,10);
+    this.password = await bcrypt.hash(this.password,10); 
     next();
 })
 
@@ -44,14 +44,28 @@ userSchema.methods.isPasswordCorrect = async function (password){
     return bcrypt.compare(password,this.password)
 };
 
-userSchema.methods.generateToken = async function (){
+userSchema.methods.generateAccessToken = async function (){                 
     return jwt.sign(
         {
-            id:this.id,
+            _id:this._id,
+            fullName: this.fullName,
+
         },
-        process.env,TOKEN_SECRET,
+        process.env,ACCESS_TOKEN_SECRET ,
         {
-            expiresIn : process.env.TOKEN_EXPIRY,
+            expiresIn : process.env.ACCESS_TOKEN_EXPIRY,
+        }
+    )
+}
+userSchema.methods.generateRefreshToken = async function (){                 
+    return jwt.sign(
+        {
+            _id:this._id,
+
+        },
+        process.env,REFRESH_TOKEN_SECRET ,
+        {
+            expiresIn : process.env.REFRESH_TOKEN_EXPIRY,
         }
     )
 }
